@@ -1,0 +1,81 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Srfc",
+  "projectDescription": "Minimal JavaScript and CSS library for creating accessible modal dialogs with focus trapping and keyboard navigation.",
+  "theme": "palm",
+  "primaryColor": "#5B8DEE",
+  "lightColor": "#7BA5F4",
+  "darkColor": "#4A73CC",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Concepts",
+        "pages": [
+          "concepts/modal-types",
+          "concepts/accessibility",
+          "concepts/events"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/basic-usage",
+          "guides/modal-groups",
+          "guides/keyboard-navigation",
+          "guides/embed-support",
+          "guides/styling"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/srfc-class",
+          "api/modal-class",
+          "api/focus-trap",
+          "api/html-attributes"
+        ]
+      },
+      {
+        "group": "Examples",
+        "pages": [
+          "examples/simple-modal",
+          "examples/linked-modals",
+          "examples/gallery",
+          "examples/video-embed"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Accessible modal dialogs with ARIA support and focus trapping",
+    "Multiple modal types: basic, linked (URL hash), arrow navigation, strong (non-dismissible)",
+    "Keyboard navigation with Escape and Arrow key support",
+    "Browser history integration for linked modals",
+    "Automatic embed fitting and resetting for iframes",
+    "Lightweight with minimal dependencies",
+    "Custom events for modal lifecycle (open.srfc, close.srfc)",
+    "TypeScript support with full type definitions"
+  ],
+  "publicApiSurface": [
+    "Srfc.init() - Initialize the library and register modal events",
+    "Srfc.open(id: string) - Open a modal by ID",
+    "Srfc.close() - Close the currently active modal",
+    "Modal class - Internal modal management",
+    "FocusTrap class - Focus trapping functionality",
+    "data-srfc attribute - Define modal containers and types",
+    "data-srfc-open attribute - Trigger elements to open modals",
+    "data-srfc-close attribute - Elements to close modals",
+    "data-srfc-embed attribute - Embed behavior (reset, fit)",
+    "data-srfc-autofocus attribute - Auto-focus elements on modal open",
+    "open.srfc event - Dispatched when modal opens",
+    "close.srfc event - Dispatched when modal closes"
+  ]
+}
