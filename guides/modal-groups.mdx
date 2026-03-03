@@ -1,0 +1,134 @@
+---
+title: Modal groups
+description: Organize and configure multiple modals using container groups
+---
+
+Modal groups allow you to configure multiple modals with shared behavior by setting options on their container element.
+
+## Creating a modal group
+
+Use the `data-srfc` attribute on a container element to create a modal group. All direct children with an `id` attribute become part of the group:
+
+```html
+<div data-srfc>
+  <div id="modal-1">
+    <!-- Modal 1 content -->
+  </div>
+  <div id="modal-2">
+    <!-- Modal 2 content -->
+  </div>
+  <div id="modal-3">
+    <!-- Modal 3 content -->
+  </div>
+</div>
+```
+
+All modals in this group will share the same configuration options.
+
+## Group types
+
+You can configure group behavior by adding type values to the `data-srfc` attribute. Multiple types can be combined:
+
+### Arrow navigation
+
+Enable arrow key navigation between modals in the group:
+
+```html
+<div data-srfc="arrow">
+  <!-- Modals here -->
+</div>
+```
+
+Users can press `ArrowRight` to move to the next modal and `ArrowLeft` to move to the previous modal. The order is determined by the DOM order of the modal elements.
+
+### Linked modals
+
+Linked modals update the browser's URL hash when opened:
+
+```html
+<div data-srfc="linked">
+  <div id="terms">
+    <!-- Terms content -->
+  </div>
+</div>
+```
+
+When opened, the URL becomes `#terms`. This allows:
+- Direct linking to specific modals
+- Browser back/forward navigation
+- Bookmark support
+
+The hash is automatically managed - it's added when the modal opens and removed when it closes.
+
+### Strong modals
+
+Strong modals cannot be closed by clicking the backdrop or pressing Escape:
+
+```html
+<div data-srfc="strong">
+  <!-- Modals here -->
+</div>
+```
+
+Users must click a close button or use a programmatic `close()` call. This is useful for critical dialogs that require explicit user action.
+
+### Partial strong modals
+
+You can disable only backdrop clicks or only Escape key:
+
+```html
+<!-- Disable backdrop clicks only -->
+<div data-srfc="strong-backdrop">
+  <!-- Modals here -->
+</div>
+
+<!-- Disable Escape key only -->
+<div data-srfc="strong-esc">
+  <!-- Modals here -->
+</div>
+```
+
+## Combining group types
+
+You can combine multiple types by separating them with spaces:
+
+```html
+<div data-srfc="arrow linked">
+  <div id="photo-1"><!-- Photo 1 --></div>
+  <div id="photo-2"><!-- Photo 2 --></div>
+  <div id="photo-3"><!-- Photo 3 --></div>
+</div>
+```
+
+This creates a photo gallery where:
+- Users can navigate with arrow keys
+- Each photo has its own URL (`#photo-1`, `#photo-2`, etc.)
+- Browser navigation works
+
+<Tip>
+For image galleries, combine `arrow` and `linked` types to create a browsable, shareable experience.
+</Tip>
+
+## Multiple groups
+
+You can have multiple modal groups with different configurations:
+
+```html
+<!-- Regular modals -->
+<div data-srfc>
+  <div id="info"><!-- Info modal --></div>
+</div>
+
+<!-- Gallery with arrow navigation -->
+<div data-srfc="arrow">
+  <div id="img-1"><!-- Image 1 --></div>
+  <div id="img-2"><!-- Image 2 --></div>
+</div>
+
+<!-- Critical dialog -->
+<div data-srfc="strong">
+  <div id="confirm-delete"><!-- Confirmation --></div>
+</div>
+```
+
+Each group operates independently with its own configuration.

@@ -1,0 +1,233 @@
+---
+title: Events
+description: Listen to modal lifecycle events in Srfc
+---
+
+Srfc dispatches custom events when modals open and close, allowing you to respond to modal state changes in your application.
+
+## Available events
+
+Srfc provides two lifecycle events:
+
+- `open.srfc` - Dispatched when a modal opens
+- `close.srfc` - Dispatched when a modal closes
+
+Both events are dispatched on the modal element itself (the element with the `id` attribute, not the container).
+
+## Event creation
+
+Events are created when the Srfc instance initializes:
+
+```typescript
+// From Srfc.ts:24-36
+constructor() {
+  try {
+    this.eventOpen = new Event('open.srfc')
+  } catch (error) {
+    this.eventOpen = undefined
+  }
+
+  try {
+    this.eventClose = new Event('close.srfc')
+  } catch (error) {
+    this.eventClose = undefined
+  }
+}
+```
+
+<Note>
+  Events use try/catch for IE compatibility. In IE without an Event polyfill, events will be `undefined` but Srfc will continue to function normally.
+</Note>
+
+## Listening for events
+
+You can listen for events using standard `addEventListener` on modal elements.
+
+<CodeGroup>
+
+```javascript Vanilla JavaScript
+const modal = document.getElementById('my-modal')
+
+modal.addEventListener('open.srfc', (event) => {
+  console.log('Modal opened:', event.target.id)
+})
+
+modal.addEventListener('close.srfc', (event) => {
+  console.log('Modal closed:', event.target.id)
+})
+```
+
+```javascript Multiple modals
+const modals = document.querySelectorAll('[data-srfc] > *')
+
+modals.forEach(modal => {
+  modal.addEventListener('open.srfc', () => {
+    console.log(`${modal.id} opened`)
+  })
+
+  modal.addEventListener('close.srfc', () => {
+    console.log(`${modal.id} closed`)
+  })
+})
+```
+
+```javascript With analytics
+const modal = document.getElementById('signup-modal')
+
+modal.addEventListener('open.srfc', () => {
+  // Track modal views
+  analytics.track('Modal Viewed', {
+    modal_id: 'signup-modal',
+    timestamp: Date.now()
+  })
+})
+
+modal.addEventListener('close.srfc', () => {
+  // Track modal dismissals
+  analytics.track('Modal Closed', {
+    modal_id: 'signup-modal',
+    timestamp: Date.now()
+  })
+})
+```
+
+</CodeGroup>
+
+## Event dispatch timing
+
+Events are dispatched at specific points in the modal lifecycle.
+
+### Open event
+
+The `open.srfc` event is dispatched at the end of the `open()` method, after:
+
+1. Active classes are added
+2. Event listeners are attached
+3. Focus trap is activated
+4. Autofocus element receives focus
+
+```typescript
+// From Modal.ts:152-154
+if (this.eventOpen != null) {
+  this.element.dispatchEvent(this.eventOpen)
+}
+```
+
+### Close event
+
+The `close.srfc` event is dispatched at the end of the `close()` method, after:
+
+1. Active classes are removed
+2. Event listeners are detached
+3. Focus trap is deactivated
+4. Body scroll is re-enabled
+
+```typescript
+// From Modal.ts:188-190
+if (this.eventClose != null) {
+  this.element.dispatchEvent(this.eventClose)
+}
+```
+
+## Common use cases
+
+### Lazy loading content
+
+Load modal content only when needed:
+
+```javascript
+const modal = document.getElementById('video-modal')
+const videoContainer = modal.querySelector('.video-container')
+
+modal.addEventListener('open.srfc', () => {
+  if (!videoContainer.hasChildNodes()) {
+    const iframe = document.createElement('iframe')
+    iframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoContainer.appendChild(iframe)
+  }
+})
+
+modal.addEventListener('close.srfc', () => {
+  // Clean up to stop video playback
+  videoContainer.innerHTML = ''
+})
+```
+
+### Form reset
+
+Reset forms when modals close:
+
+```javascript
+const modal = document.getElementById('contact-modal')
+const form = modal.querySelector('form')
+
+modal.addEventListener('close.srfc', () => {
+  form.reset()
+})
+```
+
+### State management
+
+Sync modal state with your application:
+
+```javascript
+const modal = document.getElementById('settings-modal')
+
+modal.addEventListener('open.srfc', () => {
+  store.dispatch({ type: 'MODAL_OPENED', payload: 'settings' })
+})
+
+modal.addEventListener('close.srfc', () => {
+  store.dispatch({ type: 'MODAL_CLOSED', payload: 'settings' })
+})
+```
+
+### Animation coordination
+
+Coordinate animations with modal state:
+
+```javascript
+const modal = document.getElementById('gallery-modal')
+const image = modal.querySelector('img')
+
+modal.addEventListener('open.srfc', () => {
+  image.classList.add('fade-in')
+})
+
+modal.addEventListener('close.srfc', () => {
+  image.classList.remove('fade-in')
+})
+```
+
+## Event bubbling
+
+Srfc events are standard DOM events and follow normal bubbling behavior. You can listen for events on parent elements:
+
+```javascript
+// Listen for all modal events in the document
+document.addEventListener('open.srfc', (event) => {
+  console.log('A modal opened:', event.target.id)
+})
+
+document.addEventListener('close.srfc', (event) => {
+  console.log('A modal closed:', event.target.id)
+})
+```
+
+<Tip>
+  Use event delegation on `document` to track all modal interactions in your application with a single set of listeners.
+</Tip>
+
+## Browser compatibility
+
+The `Event` constructor is not supported in IE11 without a polyfill. Srfc handles this gracefully:
+
+- Events will be `undefined` in unsupported browsers
+- Event dispatch is wrapped in null checks
+- Srfc continues to function normally without events
+
+If you need event support in IE11, include an Event constructor polyfill:
+
+```html
+<script src="https://polyfill.io/v3/polyfill.min.js?features=Event"></script>
+```

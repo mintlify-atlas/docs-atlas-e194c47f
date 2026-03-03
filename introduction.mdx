@@ -1,0 +1,70 @@
+---
+title: Introduction
+description: Srfc is a minimal JavaScript and CSS library for creating accessible modal dialogs with focus trapping and keyboard navigation.
+---
+
+# Introduction to Srfc
+
+Srfc is a minimal JavaScript and CSS library for creating accessible modal dialogs with focus trapping and keyboard navigation. Built with accessibility in mind, it provides a lightweight solution for implementing modals in your web applications.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Accessible by default" icon="universal-access">
+    Built-in ARIA support, focus trapping, and keyboard navigation ensure your modals work for everyone.
+  </Card>
+  
+  <Card title="Multiple modal types" icon="window-restore">
+    Support for basic, linked (URL hash), arrow navigation, and strong (non-dismissible) modals.
+  </Card>
+  
+  <Card title="Lightweight" icon="feather">
+    Minimal dependencies and small footprint keep your bundle size down.
+  </Card>
+  
+  <Card title="TypeScript support" icon="code">
+    Full type definitions included for a better development experience.
+  </Card>
+  
+  <Card title="Browser history integration" icon="clock-rotate-left">
+    Linked modals integrate with browser history for better navigation.
+  </Card>
+  
+  <Card title="Custom events" icon="bolt">
+    Listen to modal lifecycle events like open.srfc and close.srfc.
+  </Card>
+</CardGroup>
+
+## What you can build
+
+With Srfc, you can create:
+
+- **Basic modals** - Simple dialogs that can be dismissed by clicking the backdrop or pressing Escape
+- **Linked modals** - Modals tied to URL hashes for shareable URLs and browser history support
+- **Arrow navigation** - Image galleries or slideshows with left/right arrow key navigation
+- **Strong modals** - Non-dismissible modals for critical user flows or confirmations
+- **Embedded content** - Modals with iframe embeds that automatically fit and reset
+
+<Note>
+  Srfc handles focus trapping automatically, ensuring keyboard navigation stays within the modal when open.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install Srfc using npm, yarn, pnpm, or via CDN.
+  </Card>
+  
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get your first modal up and running in minutes.
+  </Card>
+  
+  <Card title="API Reference" icon="book" href="/api/srfc-class">
+    Explore the complete API documentation.
+  </Card>
+  
+  <Card title="Examples" icon="code" href="/examples/simple-modal">
+    See real-world examples and demos.
+  </Card>
+</CardGroup>

@@ -1,0 +1,305 @@
+---
+title: Styling
+description: Customize the appearance of your modals with CSS
+---
+
+Srfc includes a comprehensive CSS framework for styling modals. You can use the built-in classes or customize them to match your design.
+
+## The active class
+
+The core of Srfc's styling system is the `.srfc-active` class. When a modal opens, this class is added to multiple elements:
+
+```javascript
+// From Modal.ts open method
+this.element.classList.add(this.CLASS_ACTIVE)
+this.containerElement.classList.add(this.CLASS_ACTIVE)
+document.body.classList.add(this.CLASS_ACTIVE)
+```
+
+These classes are removed when the modal closes:
+
+```javascript
+// From Modal.ts close method
+this.element.classList.remove(this.CLASS_ACTIVE)
+this.containerElement.classList.remove(this.CLASS_ACTIVE)
+document.body.classList.remove(this.CLASS_ACTIVE)
+```
+
+## Body scroll locking
+
+When a modal is active, the body scroll is locked:
+
+```css
+.srfc-page-body.srfc-active {
+  overflow: hidden;
+}
+```
+
+Add the `.srfc-page-body` class to your `<body>` element:
+
+```html
+<body class="srfc-page-body">
+  <!-- Your content -->
+</body>
+```
+
+## Container styling
+
+The container element creates a fixed overlay:
+
+```css
+.srfc-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  visibility: hidden;
+  background-color: transparent;
+}
+
+.srfc-container.srfc-active {
+  visibility: visible;
+}
+```
+
+The container is hidden by default and becomes visible when the `.srfc-active` class is added.
+
+## Backdrop styling
+
+Srfc includes several backdrop opacity levels:
+
+```css
+.srfc-backdrop-100.srfc-active {
+  background-color: rgba(0, 0, 0, .5);
+}
+
+.srfc-backdrop-200.srfc-active {
+  background-color: rgba(0, 0, 0, .75);
+}
+
+.srfc-backdrop-300.srfc-active {
+  background-color: rgba(0, 0, 0, .9);
+}
+
+.srfc-backdrop-400.srfc-active {
+  background-color: rgba(0, 0, 0, 1);
+}
+```
+
+Apply these classes to your container:
+
+```html
+<div data-srfc class="srfc-container srfc-backdrop-200">
+  <!-- Modals here -->
+</div>
+```
+
+## Modal visibility
+
+The modal element itself starts hidden and becomes visible when active:
+
+```css
+.srfc {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+}
+
+.srfc.srfc-active {
+  visibility: visible;
+}
+```
+
+## Customizing modal appearance
+
+You can override Srfc's default styles or add your own:
+
+```css
+/* Custom backdrop color */
+.my-custom-backdrop.srfc-active {
+  background-color: rgba(25, 50, 100, 0.8);
+}
+
+/* Custom modal background */
+.my-modal {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom modal dimensions */
+.my-modal .srfc-wrap {
+  width: 800px;
+  padding: 32px;
+}
+```
+
+Apply your custom classes to the HTML:
+
+```html
+<div data-srfc class="srfc-container my-custom-backdrop">
+  <div id="custom-modal" class="srfc my-modal">
+    <div class="srfc-wrap">
+      <!-- Content -->
+    </div>
+  </div>
+</div>
+```
+
+## Built-in utility classes
+
+Srfc includes many utility classes for common layouts:
+
+### Position and size
+
+```css
+/* Add padding around modal */
+.srfc-padded {
+  top: 48px;
+  right: 48px;
+  bottom: 48px;
+  left: 48px;
+}
+
+/* Width presets */
+.srfc-width-small { width: 300px; }
+.srfc-width-medium { width: 600px; }
+.srfc-width-large { width: 900px; }
+.srfc-width-xlarge { width: 1200px; }
+
+/* Snap to edges */
+.srfc-snap-left { /* Snap to left edge */ }
+.srfc-snap-right { /* Snap to right edge */ }
+.srfc-snap-top { /* Snap to top edge */ }
+.srfc-snap-bottom { /* Snap to bottom edge */ }
+.srfc-snap-all { /* Fill entire viewport */ }
+```
+
+### Content structure
+
+```css
+/* Modal body with scroll */
+.srfc-body {
+  overflow-y: auto;
+}
+
+/* Expanding body */
+.srfc-body-expand {
+  position: relative;
+  flex: 1;
+}
+
+/* Header with flex layout */
+.srfc-header {
+  display: flex;
+}
+
+/* Padding utilities */
+.srfc-p { padding: 16px; }
+.srfc-p-x { padding-right: 16px; padding-left: 16px; }
+.srfc-p-t { padding-top: 16px; }
+.srfc-p-b { padding-bottom: 16px; }
+```
+
+### Theme
+
+```css
+.srfc-theme-default {
+  background-color: #fff;
+}
+
+.srfc-theme-on-dark {
+  color: #fff;
+}
+```
+
+## Animation and transitions
+
+Srfc includes several animation classes that work when `prefers-reduced-motion` is not set:
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  .srfc-container {
+    transition: visibility 120ms, background-color 120ms;
+  }
+  
+  .srfc-scale-fade {
+    opacity: 0;
+    transition: transform 120ms, opacity 120ms, visibility 120ms;
+    transform: scale(.98);
+  }
+  
+  .srfc.srfc-active .srfc-scale-fade {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+```
+
+Available animation classes:
+- `.srfc-scale-fade` - Scales and fades in
+- `.srfc-fade` - Simple fade in
+- `.srfc-slide-left` - Slides in from left
+- `.srfc-slide-right` - Slides in from right
+- `.srfc-slide-top` - Slides in from top
+- `.srfc-slide-bottom` - Slides in from bottom
+
+### Using animations
+
+Apply animation classes to the modal content:
+
+```html
+<div data-srfc class="srfc-container srfc-backdrop-200">
+  <div id="animated-modal" class="srfc">
+    <div class="srfc-wrap srfc-scale-fade">
+      <h2>Animated Modal</h2>
+      <p>This modal scales and fades in.</p>
+    </div>
+  </div>
+</div>
+```
+
+<Note>
+Animations automatically respect the user's `prefers-reduced-motion` setting for accessibility.
+</Note>
+
+## Complete styled example
+
+Here's a fully styled modal using Srfc's utility classes:
+
+```html
+<div data-srfc class="srfc-container srfc-backdrop-200">
+  <div id="styled-modal" class="srfc srfc-padded">
+    <div class="srfc-wrap srfc-width-medium srfc-scale-fade srfc-theme-default">
+      <div class="srfc-header srfc-p">
+        <div class="srfc-header-content">
+          <h2 class="srfc-title">Welcome</h2>
+        </div>
+        <button data-srfc-close class="srfc-header-x"></button>
+      </div>
+      <div class="srfc-body srfc-p-x srfc-p-b">
+        <p>This modal uses Srfc's built-in styling utilities.</p>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+This creates a centered modal with:
+- Medium width (600px)
+- Padding around all edges
+- Scale and fade animation
+- White background
+- Header with close button
+- Scrollable body
+- Dark backdrop at 75% opacity
+
+<Tip>
+Start with Srfc's utility classes, then add your own CSS for brand-specific customization.
+</Tip>

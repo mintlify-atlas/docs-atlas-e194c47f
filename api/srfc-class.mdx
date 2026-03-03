@@ -1,0 +1,143 @@
+---
+title: "Srfc Class"
+description: "Main class for initializing and controlling modals"
+---
+
+The `Srfc` class is the primary interface for managing modals in your application. It handles initialization, opening, closing, and navigation between modals.
+
+## Constructor
+
+```typescript
+constructor()
+```
+
+Creates a new Srfc instance. The constructor takes no parameters and automatically sets up internal event handlers.
+
+```javascript
+import { Srfc } from 'srfc'
+
+const srfc = new Srfc()
+```
+
+## Methods
+
+### init()
+
+```typescript
+init(): void
+```
+
+Initializes the Srfc instance by scanning the DOM for modals and registering event listeners. Call this method once after creating your Srfc instance.
+
+**What it does:**
+- Finds all elements with `data-srfc` attribute and creates Modal instances
+- Registers click handlers for `data-srfc-open` trigger elements
+- Registers click handlers for `data-srfc-close` buttons
+- Sets up browser history navigation for linked modals
+- Opens linked modals if URL hash matches a modal ID on page load
+
+```javascript
+const srfc = new Srfc()
+srfc.init()
+```
+
+### open()
+
+```typescript
+open(id: string): void
+```
+
+Opens a modal by its ID.
+
+<ParamField path="id" type="string" required>
+  The value of the `id` attribute of the modal element you wish to open
+</ParamField>
+
+**Behavior:**
+- Closes any currently active modal before opening the new one
+- Updates browser history for linked modals
+- Stores reference to previously focused element for focus restoration
+- Throws an error if the modal ID is not found
+
+```javascript
+srfc.open('my-modal-id')
+```
+
+### close()
+
+```typescript
+close(): void
+```
+
+Closes the currently active modal. If no modal is active, this method does nothing.
+
+**Behavior:**
+- Removes active state from the modal
+- Updates browser history for linked modals (navigates back)
+- Restores focus to the element that was active before the modal opened
+
+```javascript
+srfc.close()
+```
+
+## Properties
+
+### modals
+
+```typescript
+private readonly modals: Map<string, Modal>
+```
+
+Internal map storing all initialized Modal instances, keyed by their element IDs. This property is private and not intended for direct access.
+
+### active
+
+```typescript
+private active: Modal | undefined
+```
+
+Reference to the currently active modal. Returns `undefined` if no modal is open. This property is private and not intended for direct access.
+
+### attributes
+
+The Srfc class uses these data attribute constants internally:
+
+- `ATTRIBUTE_CONTAINER`: `'data-srfc'` - Marks container elements
+- `ATTRIBUTE_OPEN`: `'data-srfc-open'` - Marks trigger elements
+- `ATTRIBUTE_CLOSE`: `'data-srfc-close'` - Marks close buttons
+
+## Events
+
+The Srfc class dispatches custom events on modal elements:
+
+- `open.srfc` - Fired when a modal opens
+- `close.srfc` - Fired when a modal closes
+
+You can listen for these events on individual modal elements:
+
+```javascript
+const modalElement = document.getElementById('my-modal')
+modalElement.addEventListener('open.srfc', () => {
+  console.log('Modal opened')
+})
+```
+
+## Usage Example
+
+```javascript
+import { Srfc } from 'srfc'
+
+// Create and initialize
+const srfc = new Srfc()
+srfc.init()
+
+// Open a modal programmatically
+document.getElementById('custom-button').addEventListener('click', () => {
+  srfc.open('gallery-modal')
+})
+
+// Close programmatically
+document.getElementById('custom-close').addEventListener('click', () => {
+  srfc.close()
+})
+```

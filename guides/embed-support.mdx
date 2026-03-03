@@ -1,0 +1,255 @@
+---
+title: Embed support
+description: Display video embeds and iframes in modals with automatic sizing
+---
+
+Srfc provides built-in support for video embeds and iframes with automatic sizing and cleanup.
+
+## The embed attribute
+
+Use the `data-srfc-embed` attribute on iframe elements to enable special handling:
+
+```html
+<div data-srfc>
+  <div id="video-modal">
+    <iframe 
+      data-srfc-embed="reset fit"
+      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      width="560" 
+      height="315"
+    ></iframe>
+  </div>
+</div>
+```
+
+The attribute accepts two modes: `reset` and `fit`. You can use them individually or together.
+
+## Reset mode
+
+The `reset` mode resets the iframe's `src` attribute when the modal closes. This stops video/audio playback:
+
+```html
+<iframe 
+  data-srfc-embed="reset"
+  src="https://player.vimeo.com/video/123456789"
+></iframe>
+```
+
+### How reset works
+
+The `resetSrc()` function reloads the iframe by setting its `src` to its current value:
+
+```javascript
+// From embedUtils.ts
+export function resetSrc (element: Element): void {
+  const src = element.getAttribute('src')
+  if (src === null) throw new Error('This element does not have the \'src\' attribute defined.')
+  element.setAttribute('src', src)
+}
+```
+
+This is called automatically when the modal closes:
+
+```javascript
+// From Modal.ts close method
+this.embedsToReset.forEach(resetSrc)
+```
+
+<Note>
+Resetting the `src` causes the iframe to reload, which stops any playing media. This is essential for YouTube and Vimeo embeds.
+</Note>
+
+## Fit mode
+
+The `fit` mode automatically sizes the iframe to fit inside its parent container while maintaining aspect ratio:
+
+```html
+<iframe 
+  data-srfc-embed="fit"
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  width="560" 
+  height="315"
+></iframe>
+```
+
+The `width` and `height` attributes define the aspect ratio. The iframe will be sized as large as possible within the parent while maintaining this ratio.
+
+### How fit works
+
+The `fit()` function calculates dimensions based on the aspect ratio:
+
+```javascript
+// From embedUtils.ts
+export function fit (element: Element): void {
+  if (element instanceof HTMLElement) {
+    const widthAttribute = element.getAttribute('width')
+    const heightAttribute = element.getAttribute('height')
+
+    if (widthAttribute === null) return
+    if (heightAttribute === null) return
+
+    const width = parseInt(widthAttribute)
+    const height = parseInt(heightAttribute)
+
+    const ratio = height / width
+
+    const parentWidth = element.parentElement?.clientWidth
+    const parentHeight = element.parentElement?.clientHeight
+
+    if (parentWidth === undefined) return
+    if (parentHeight === undefined) return
+
+    let w = parentWidth
+    let h = w * ratio
+    if (h > parentHeight) {
+      h = parentHeight
+      w = h / ratio
+    }
+
+    element.style.width = `${w.toString()}px`
+    element.style.height = `${h.toString()}px`
+  }
+}
+```
+
+The function:
+1. Reads the `width` and `height` attributes to determine aspect ratio
+2. Gets the parent container's dimensions
+3. Calculates the largest size that fits while maintaining aspect ratio
+4. Sets the `style.width` and `style.height` properties
+
+### Responsive fitting
+
+Fit mode automatically updates when the window resizes:
+
+```javascript
+// From Modal.ts
+private resizeHandler (): void {
+  this.embedsToFit.forEach(fit)
+}
+```
+
+The resize handler is attached when the modal opens and removed when it closes.
+
+## Combining reset and fit
+
+For the best experience, use both modes together:
+
+```html
+<div data-srfc>
+  <div id="youtube-video">
+    <div class="srfc-embed-fit">
+      <iframe 
+        data-srfc-embed="reset fit"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        width="560" 
+        height="315"
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+</div>
+```
+
+This ensures:
+- The video sizes correctly (`fit`)
+- The video stops playing when closed (`reset`)
+- The video responds to window resizing
+
+## Practical examples
+
+### YouTube embed
+
+```html
+<div data-srfc="arrow">
+  <div id="video-1" class="srfc srfc-padded">
+    <div class="srfc-wrap srfc-body-expand">
+      <div class="srfc-embed-fit">
+        <iframe 
+          data-srfc-embed="reset fit"
+          src="https://www.youtube.com/embed/VIDEO_ID_1"
+          width="560" 
+          height="315"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+  <div id="video-2" class="srfc srfc-padded">
+    <div class="srfc-wrap srfc-body-expand">
+      <div class="srfc-embed-fit">
+        <iframe 
+          data-srfc-embed="reset fit"
+          src="https://www.youtube.com/embed/VIDEO_ID_2"
+          width="560" 
+          height="315"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Vimeo embed
+
+```html
+<div data-srfc>
+  <div id="vimeo-video" class="srfc srfc-padded">
+    <div class="srfc-wrap srfc-body-expand">
+      <div class="srfc-embed-fit">
+        <iframe 
+          data-srfc-embed="reset fit"
+          src="https://player.vimeo.com/video/VIDEO_ID"
+          width="640" 
+          height="360"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+<Tip>
+Always include the `width` and `height` attributes on the iframe element. These define the aspect ratio for the `fit` function.
+</Tip>
+
+## CSS classes for embeds
+
+Srfc includes utility classes for common embed layouts:
+
+```css
+/* Expand to fill container */
+.srfc-embed-expand {
+  width: 100%;
+  height: 100%;
+}
+
+.srfc-embed-expand iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fit with aspect ratio preservation */
+.srfc-embed-fit {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.srfc-embed-fit iframe {
+  margin-right: auto;
+  margin-left: auto;
+}
+```
+
+Use `.srfc-embed-fit` as a wrapper when using `data-srfc-embed="fit"`, and `.srfc-embed-expand` for full-container embeds.

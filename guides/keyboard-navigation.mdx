@@ -1,0 +1,157 @@
+---
+title: Keyboard navigation
+description: Understand keyboard controls and focus management in Srfc modals
+---
+
+Srfc provides comprehensive keyboard navigation to ensure your modals are accessible.
+
+## Escape key
+
+By default, pressing the `Escape` key closes the active modal:
+
+```javascript
+// From Modal.ts escKeyHandler
+private escKeyHandler (event: KeyboardEvent): void {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    this.close()
+    if (this.isLinked) {
+      window.history.back()
+    }
+    this.onClose()
+  }
+}
+```
+
+The handler also supports the older `Esc` key value for IE11 compatibility. If the modal is linked, it also updates the browser history.
+
+### Disabling Escape key
+
+To prevent closing with Escape, use the `strong` or `strong-esc` group type:
+
+```html
+<!-- Disable all keyboard closing -->
+<div data-srfc="strong">
+  <div id="my-modal"><!-- Content --></div>
+</div>
+
+<!-- Disable only Escape key -->
+<div data-srfc="strong-esc">
+  <div id="my-modal"><!-- Content --></div>
+</div>
+```
+
+When `isClosableByEsc` is false, the Escape key handler is never attached.
+
+## Arrow keys
+
+Enable arrow key navigation between modals in a group with the `arrow` type:
+
+```html
+<div data-srfc="arrow">
+  <div id="slide-1"><!-- Slide 1 --></div>
+  <div id="slide-2"><!-- Slide 2 --></div>
+  <div id="slide-3"><!-- Slide 3 --></div>
+</div>
+```
+
+The arrow key handler navigates through sibling modals:
+
+```javascript
+// From Modal.ts arrowKeysHandler
+private arrowKeysHandler (event: KeyboardEvent): void {
+  if (event.key === 'ArrowRight' || event.key === 'Right') {
+    this.onNext()
+  } else if (event.key === 'ArrowLeft' || event.key === 'Left') {
+    this.onPrev()
+  }
+}
+```
+
+- `ArrowRight` or `Right` → opens the next modal
+- `ArrowLeft` or `Left` → opens the previous modal
+
+The handler supports older key values (`Right`, `Left`) for IE11.
+
+<Note>
+Arrow navigation only works when explicitly enabled with `data-srfc="arrow"`. This prevents conflicts with other keyboard interactions inside the modal.
+</Note>
+
+## Tab key and focus trap
+
+Srfc automatically implements focus trapping when a modal opens. This ensures that pressing `Tab` cycles focus only through interactive elements within the active modal.
+
+The focus trap:
+- Activates when the modal opens
+- Deactivates when the modal closes
+- Prevents focus from leaving the modal
+- Returns focus to the trigger element when closed
+
+### Focus management on open
+
+When a modal opens, Srfc remembers which element had focus:
+
+```javascript
+// From Srfc.ts open method
+if (document.activeElement instanceof HTMLElement) {
+  this.activeElementBeforeOpening = document.activeElement
+}
+```
+
+### Focus management on close
+
+When the modal closes, focus returns to the original element:
+
+```javascript
+// From Srfc.ts close method
+this.active = undefined
+this.activeElementBeforeOpening?.focus()
+```
+
+This ensures users don't lose their place when dismissing a modal.
+
+## Autofocus
+
+You can automatically focus an element when the modal opens using the `data-srfc-autofocus` attribute:
+
+```html
+<div data-srfc>
+  <div id="login">
+    <h2>Login</h2>
+    <input type="text" data-srfc-autofocus placeholder="Username">
+    <input type="password" placeholder="Password">
+    <button>Submit</button>
+  </div>
+</div>
+```
+
+The autofocus element receives focus after the modal's opening transition completes:
+
+```javascript
+// From Modal.ts open method
+const autofocusElement = this.element.querySelector(`[${this.ATTRIBUTE_AUTOFOCUS}]`)
+if (autofocusElement instanceof HTMLElement) {
+  this.autofocusElement = autofocusElement
+  this.autofocusElement.focus()
+
+  // Handle transitions
+  if (this.autofocusElement !== document.activeElement) {
+    this.element.addEventListener('transitionend', 
+      this.AUTOFOCUS_TRANSITIONEND_HANDLER_BINDED, 
+      { once: true }
+    )
+  }
+}
+```
+
+<Tip>
+Use autofocus on form inputs to improve usability. Users can start typing immediately without clicking.
+</Tip>
+
+## Keyboard navigation summary
+
+| Key | Action | Can disable with |
+|-----|--------|------------------|
+| `Escape` | Close modal | `strong` or `strong-esc` |
+| `ArrowRight` | Next modal | Only enabled with `arrow` |
+| `ArrowLeft` | Previous modal | Only enabled with `arrow` |
+| `Tab` | Navigate focusable elements | Always enabled |

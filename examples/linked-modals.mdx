@@ -1,0 +1,200 @@
+---
+title: Linked Modals
+description: Modals connected to URL hash for browser history integration
+---
+
+Linked modals synchronize with the browser's URL hash, enabling back/forward button navigation and deep linking to modal states.
+
+## Complete Example
+
+<CodeGroup>
+
+```html HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linked Modals</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Linked Modal Demo</h1>
+  
+  <button data-srfc-open="about">Open About</button>
+  <button data-srfc-open="contact">Open Contact</button>
+  <button data-srfc-open="settings">Open Settings</button>
+
+  <!-- Linked modal container -->
+  <div data-srfc="linked">
+    <!-- About Modal -->
+    <div id="about">
+      <div class="modal-content">
+        <h2>About Us</h2>
+        <p>This modal is linked to #about in the URL.</p>
+        <p>Try pressing the back button!</p>
+        <button data-srfc-open="contact">Go to Contact</button>
+        <button data-srfc-close>Close</button>
+      </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact">
+      <div class="modal-content">
+        <h2>Contact</h2>
+        <p>This modal is linked to #contact in the URL.</p>
+        <button data-srfc-open="settings">Go to Settings</button>
+        <button data-srfc-open="about">Back to About</button>
+        <button data-srfc-close>Close</button>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings">
+      <div class="modal-content">
+        <h2>Settings</h2>
+        <p>This modal is linked to #settings in the URL.</p>
+        <button data-srfc-open="contact">Back to Contact</button>
+        <button data-srfc-close>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="srfc.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+```
+
+```css CSS
+/* Container backdrop */
+[data-srfc] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+[data-srfc].srfc-active {
+  display: flex;
+}
+
+/* Modal elements */
+[data-srfc] > * {
+  opacity: 0;
+  transform: translateY(-50px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+[data-srfc] > .srfc-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Modal content */
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content button {
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem 0 0;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background: #0056b3;
+}
+
+body.srfc-active {
+  overflow: hidden;
+}
+```
+
+```javascript JavaScript
+// Initialize Srfc
+const srfc = new Srfc();
+srfc.init();
+
+// You can also open linked modals programmatically
+// srfc.open('about');
+```
+
+</CodeGroup>
+
+## How It Works
+
+### The `linked` Type
+
+Add `data-srfc="linked"` to the container to enable URL hash synchronization:
+
+```html
+<div data-srfc="linked">
+  <div id="modal-name">...</div>
+</div>
+```
+
+### URL Behavior
+
+When a linked modal opens:
+- URL changes to `#modal-id` (e.g., `https://example.com#about`)
+- New history entry is pushed to browser history
+- Page is shareable at this URL
+
+When the modal closes:
+- Browser navigates back, removing the hash
+- `popstate` event is handled automatically
+
+### Navigation Between Modals
+
+Opening a linked modal while another linked modal is active:
+- URL hash is **replaced** (not pushed) with the new modal ID
+- Creates seamless navigation without cluttering history
+
+### Back Button Integration
+
+Pressing the browser's back button:
+- Closes the current modal
+- Returns to the previous state
+- No page reload required
+
+## Deep Linking
+
+Visiting a URL with a hash automatically opens that modal:
+
+```
+https://example.com#contact → Opens the Contact modal
+https://example.com#settings → Opens the Settings modal
+```
+
+<Tip>
+Linked modals are perfect for forms, wizards, or any content you want users to bookmark or share.
+</Tip>
+
+## Progressive Enhancement
+
+Use anchor links as openers for JavaScript-free fallback:
+
+```html
+<a href="#about" data-srfc-open="about">Open About</a>
+```
+
+The `data-srfc-open` attribute prevents default navigation and opens the modal instead.

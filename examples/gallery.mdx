@@ -1,0 +1,242 @@
+---
+title: Gallery with Arrow Navigation
+description: Image lightbox gallery with keyboard arrow navigation
+---
+
+Create an image gallery where users can navigate between images using arrow keys. Perfect for photo galleries, product showcases, and portfolios.
+
+## Complete Example
+
+<CodeGroup>
+
+```html HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Photo Gallery</h1>
+  
+  <div class="gallery-grid">
+    <img src="photo-1.jpg" alt="Mountain landscape" data-srfc-open="image-1">
+    <img src="photo-2.jpg" alt="Ocean sunset" data-srfc-open="image-2">
+    <img src="photo-3.jpg" alt="Forest path" data-srfc-open="image-3">
+    <img src="photo-4.jpg" alt="City lights" data-srfc-open="image-4">
+  </div>
+
+  <!-- Gallery modal container with arrow navigation -->
+  <div data-srfc="arrow">
+    <!-- Image 1 -->
+    <div id="image-1">
+      <div class="lightbox">
+        <button class="close-btn" data-srfc-close>&times;</button>
+        <img src="photo-1-large.jpg" alt="Mountain landscape">
+        <div class="caption">Mountain Landscape</div>
+      </div>
+    </div>
+
+    <!-- Image 2 -->
+    <div id="image-2">
+      <div class="lightbox">
+        <button class="close-btn" data-srfc-close>&times;</button>
+        <img src="photo-2-large.jpg" alt="Ocean sunset">
+        <div class="caption">Ocean Sunset</div>
+      </div>
+    </div>
+
+    <!-- Image 3 -->
+    <div id="image-3">
+      <div class="lightbox">
+        <button class="close-btn" data-srfc-close>&times;</button>
+        <img src="photo-3-large.jpg" alt="Forest path">
+        <div class="caption">Forest Path</div>
+      </div>
+    </div>
+
+    <!-- Image 4 -->
+    <div id="image-4">
+      <div class="lightbox">
+        <button class="close-btn" data-srfc-close>&times;</button>
+        <img src="photo-4-large.jpg" alt="City lights">
+        <div class="caption">City Lights at Night</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="srfc.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+```
+
+```css CSS
+/* Gallery grid */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.gallery-grid img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.gallery-grid img:hover {
+  transform: scale(1.05);
+}
+
+/* Modal container */
+[data-srfc] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+[data-srfc].srfc-active {
+  display: flex;
+}
+
+/* Modal elements */
+[data-srfc] > * {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+[data-srfc] > .srfc-active {
+  opacity: 1;
+}
+
+/* Lightbox */
+.lightbox {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: calc(90vh - 60px);
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.close-btn:hover {
+  color: #ccc;
+}
+
+.caption {
+  color: white;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+body.srfc-active {
+  overflow: hidden;
+}
+```
+
+```javascript JavaScript
+// Initialize Srfc
+const srfc = new Srfc();
+srfc.init();
+```
+
+</CodeGroup>
+
+## How It Works
+
+### The `arrow` Type
+
+Add `data-srfc="arrow"` to enable keyboard arrow navigation:
+
+```html
+<div data-srfc="arrow">
+  <div id="image-1">...</div>
+  <div id="image-2">...</div>
+  <div id="image-3">...</div>
+</div>
+```
+
+### Keyboard Navigation
+
+When a modal is open in an `arrow` group:
+- **Arrow Right** / **Right**: Opens the next modal
+- **Arrow Left** / **Left**: Opens the previous modal
+- **Escape**: Closes the modal
+
+### Sibling Detection
+
+Srfc automatically detects adjacent modals within the same container:
+- Modals navigate to their immediate sibling elements
+- First modal has no previous
+- Last modal has no next
+- Only elements with an `id` attribute are considered modals
+
+## Opening Specific Images
+
+You can open any image programmatically:
+
+```javascript
+const srfc = new Srfc();
+srfc.init();
+
+// Open the third image
+srfc.open('image-3');
+```
+
+## Combining with Linked
+
+You can combine `arrow` with `linked` for URL integration:
+
+```html
+<div data-srfc="arrow linked">
+  <div id="image-1">...</div>
+  <div id="image-2">...</div>
+</div>
+```
+
+Now the URL will update as users navigate: `#image-1`, `#image-2`, etc.
+
+<Tip>
+Arrow navigation works automatically based on DOM order. Arrange your modal elements in the order you want users to navigate through them.
+</Tip>
+
+<Note>
+The arrow key listeners are only active when a modal in the `arrow` group is open, so they won't interfere with page scrolling or other keyboard interactions.
+</Note>

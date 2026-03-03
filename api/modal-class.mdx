@@ -1,0 +1,158 @@
+---
+title: "Modal Class"
+description: "Internal class representing individual modal instances"
+---
+
+The `Modal` class represents an individual modal instance. It handles the DOM interactions, event management, and behavior for a single modal. This class is created internally by the Srfc class during initialization and is not typically instantiated directly by users.
+
+## Constructor
+
+```typescript
+constructor(
+  element: Element,
+  containerElement: Element,
+  isLinked: boolean,
+  isArrowEnabled: boolean,
+  isClosableByBackdrop: boolean,
+  isClosableByEsc: boolean,
+  onNext: () => void,
+  onPrev: () => void,
+  onClose: () => void,
+  eventOpen: Event | undefined,
+  eventClose: Event | undefined
+)
+```
+
+<ParamField path="element" type="Element" required>
+  The modal element itself (the child element inside the container)
+</ParamField>
+
+<ParamField path="containerElement" type="Element" required>
+  The container element with the `data-srfc` attribute
+</ParamField>
+
+<ParamField path="isLinked" type="boolean" required>
+  Whether the modal is of type `linked` (syncs with URL hash)
+</ParamField>
+
+<ParamField path="isArrowEnabled" type="boolean" required>
+  Whether the modal responds to arrow key navigation (type `arrow`)
+</ParamField>
+
+<ParamField path="isClosableByBackdrop" type="boolean" required>
+  Whether clicking the backdrop closes the modal (false for `strong` types)
+</ParamField>
+
+<ParamField path="isClosableByEsc" type="boolean" required>
+  Whether pressing Escape closes the modal (false for `strong` types)
+</ParamField>
+
+<ParamField path="onNext" type="() => void" required>
+  Callback function to navigate to the next modal in sequence
+</ParamField>
+
+<ParamField path="onPrev" type="() => void" required>
+  Callback function to navigate to the previous modal in sequence
+</ParamField>
+
+<ParamField path="onClose" type="() => void" required>
+  Callback function executed when the modal closes
+</ParamField>
+
+<ParamField path="eventOpen" type="Event | undefined" required>
+  Custom `open.srfc` event to dispatch when modal opens
+</ParamField>
+
+<ParamField path="eventClose" type="Event | undefined" required>
+  Custom `close.srfc` event to dispatch when modal closes
+</ParamField>
+
+## Methods
+
+### open()
+
+```typescript
+open(): void
+```
+
+Opens the modal by adding the `srfc-active` class and setting up event listeners.
+
+**What it does:**
+- Adds `srfc-active` class to both the modal element and container
+- Registers event handlers (backdrop clicks, keyboard events, etc.)
+- Processes embed elements with `data-srfc-embed` attribute
+- Activates focus trap to keep keyboard focus within the modal
+- Focuses the element with `data-srfc-autofocus` if present
+- Adds `srfc-active` class to document body (typically to prevent scrolling)
+- Dispatches the `open.srfc` event
+
+### close()
+
+```typescript
+close(): void
+```
+
+Closes the modal by removing the `srfc-active` class and cleaning up event listeners.
+
+**What it does:**
+- Removes `srfc-active` class from modal element and container
+- Removes all event handlers
+- Resets embed elements marked with `reset` type
+- Deactivates focus trap
+- Removes `srfc-active` class from document body
+- Dispatches the `close.srfc` event
+
+## Properties
+
+### isLinked
+
+```typescript
+public readonly isLinked: boolean
+```
+
+Public property indicating whether this modal is of type `linked`. Linked modals sync with the browser's URL hash and respond to back/forward navigation.
+
+### focusTrap
+
+```typescript
+private readonly focusTrap: FocusTrap
+```
+
+Internal FocusTrap instance that manages keyboard focus within the modal.
+
+## Internal Behavior
+
+### Keyboard Handling
+
+The Modal class handles various keyboard events:
+
+- **Escape key**: Closes the modal (if `isClosableByEsc` is true)
+- **Arrow keys**: Navigates between modals in the same container (if `isArrowEnabled` is true)
+  - Right arrow: Opens next modal
+  - Left arrow: Opens previous modal
+
+### Embed Management
+
+The Modal class automatically processes iframe and video embeds:
+
+- Elements with `data-srfc-embed="reset"` have their `src` reset when the modal closes
+- Elements with `data-srfc-embed="fit"` are automatically resized to maintain aspect ratio
+- Window resize events update fitted embeds dynamically
+
+### Focus Management
+
+- Activates a focus trap when opened to keep keyboard navigation within the modal
+- Automatically focuses the element with `data-srfc-autofocus` attribute
+- Handles edge cases with CSS transitions to ensure autofocus works reliably
+
+### Class Constants
+
+The Modal class uses these constants:
+
+- `CLASS_ACTIVE`: `'srfc-active'` - Class added to active modals
+- `ATTRIBUTE_EMBED`: `'data-srfc-embed'` - Attribute for embed elements
+- `ATTRIBUTE_AUTOFOCUS`: `'data-srfc-autofocus'` - Attribute for autofocus elements
+
+## Usage Note
+
+You typically don't instantiate Modal class directly. The Srfc class creates Modal instances during initialization based on your HTML structure. However, understanding the Modal class is useful for advanced customization and debugging.

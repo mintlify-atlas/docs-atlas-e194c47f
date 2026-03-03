@@ -1,0 +1,109 @@
+---
+title: Basic usage
+description: Learn how to create your first modal with Srfc
+---
+
+This guide will walk you through creating your first modal dialog with Srfc.
+
+<Steps>
+
+<Step title="Add the HTML structure">
+
+Create a container element with the `data-srfc` attribute. Inside it, add modal elements with unique IDs:
+
+```html
+<div data-srfc>
+  <div id="my-modal">
+    <div>
+      <h2>My Modal</h2>
+      <p>This is the modal content.</p>
+      <button data-srfc-close>Close</button>
+    </div>
+  </div>
+</div>
+```
+
+The `data-srfc` attribute marks the container, and each child with an `id` becomes a modal.
+
+</Step>
+
+<Step title="Add a trigger button">
+
+Create a button that opens the modal using the `data-srfc-open` attribute:
+
+```html
+<button data-srfc-open="my-modal">Open Modal</button>
+```
+
+The value of `data-srfc-open` should match the modal's `id`.
+
+</Step>
+
+<Step title="Initialize Srfc">
+
+Import and initialize Srfc in your JavaScript:
+
+```javascript
+import { Srfc } from 'srfc'
+
+const srfc = new Srfc()
+srfc.init()
+```
+
+The `init()` method finds all modals in the DOM, registers event listeners, and sets up keyboard handlers.
+
+</Step>
+
+<Step title="Open and close modals programmatically">
+
+You can control modals programmatically using the `open()` and `close()` methods:
+
+```javascript
+// Open a modal by ID
+srfc.open('my-modal')
+
+// Close the currently active modal
+srfc.close()
+```
+
+The `open()` method accepts a modal ID as a string. It will automatically close any currently active modal before opening the new one.
+
+</Step>
+
+</Steps>
+
+## Complete example
+
+Here's a complete working example:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="srfc.css">
+</head>
+<body>
+  <button data-srfc-open="welcome">Open Welcome Modal</button>
+
+  <div data-srfc class="srfc-container">
+    <div id="welcome" class="srfc">
+      <div class="srfc-wrap">
+        <h2>Welcome!</h2>
+        <p>This is your first Srfc modal.</p>
+        <button data-srfc-close>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Srfc } from './srfc.js'
+    const srfc = new Srfc()
+    srfc.init()
+  </script>
+</body>
+</html>
+```
+
+<Note>
+By default, modals can be closed by clicking the backdrop or pressing the Escape key. You can change this behavior using modal group types.
+</Note>

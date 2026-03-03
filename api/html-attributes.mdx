@@ -1,0 +1,307 @@
+---
+title: "HTML Attributes"
+description: "Data attributes for configuring modal behavior in HTML"
+---
+
+Srfc uses HTML data attributes to configure modal behavior directly in your markup. This approach keeps your HTML declarative and minimizes the need for JavaScript configuration.
+
+## Container Attributes
+
+### data-srfc
+
+<ParamField path="data-srfc" type="string" required>
+  Marks a container element and defines modal types. Value is a space-separated list of modal types.
+</ParamField>
+
+The `data-srfc` attribute identifies a modal container and configures the behavior of all modals within it.
+
+**Available types:**
+
+- `linked` - Syncs modal state with URL hash and browser history
+- `arrow` - Enables arrow key navigation between sibling modals
+- `strong` - Disables both backdrop clicks and Escape key (modal cannot be closed by user)
+- `strong-backdrop` - Disables backdrop clicks only
+- `strong-esc` - Disables Escape key only
+
+**Type references in source code:**
+- `GROUP_TYPE_LINKED`: `'linked'` (srfc.ts:9)
+- `GROUP_TYPE_ARROW`: `'arrow'` (srfc.ts:8)
+- `GROUP_TYPE_STRONG`: `'strong'` (srfc.ts:10)
+- `GROUP_TYPE_STRONG_BACKDROP`: `'strong-backdrop'` (srfc.ts:11)
+- `GROUP_TYPE_STRONG_ESC`: `'strong-esc'` (srfc.ts:12)
+
+**Examples:**
+
+```html
+<!-- Basic modal container -->
+<div data-srfc="">
+  <div id="my-modal">
+    <!-- Modal content -->
+  </div>
+</div>
+```
+
+```html
+<!-- Linked modal with arrow navigation -->
+<div data-srfc="linked arrow">
+  <div id="gallery-1">Image 1</div>
+  <div id="gallery-2">Image 2</div>
+  <div id="gallery-3">Image 3</div>
+</div>
+```
+
+```html
+<!-- Strong modal (must be closed programmatically) -->
+<div data-srfc="strong">
+  <div id="loading-modal">
+    Loading...
+  </div>
+</div>
+```
+
+```html
+<!-- Disable backdrop only -->
+<div data-srfc="strong-backdrop">
+  <div id="important-message">
+    Press Escape or click the close button
+  </div>
+</div>
+```
+
+## Trigger Attributes
+
+### data-srfc-open
+
+<ParamField path="data-srfc-open" type="string" required>
+  Marks an element as a modal trigger. Value is the ID of the modal to open.
+</ParamField>
+
+Add this attribute to any element to make it open a modal when clicked. Works with buttons, links, or any clickable element.
+
+**Attribute reference:** `ATTRIBUTE_OPEN`: `'data-srfc-open'` (srfc.ts:5)
+
+**Examples:**
+
+```html
+<!-- Button trigger -->
+<button data-srfc-open="my-modal">
+  Open Modal
+</button>
+```
+
+```html
+<!-- Link trigger (progressive enhancement) -->
+<a href="#my-modal" data-srfc-open="my-modal">
+  View Details
+</a>
+```
+
+**Behavior:**
+- Calls `event.preventDefault()` on links to prevent navigation
+- Can be placed anywhere in the document
+- Multiple triggers can open the same modal
+
+## Close Attributes
+
+### data-srfc-close
+
+<ParamField path="data-srfc-close" type="">
+  Marks an element as a close button. No value required.
+</ParamField>
+
+Add this attribute to create a close button within your modal. When clicked, it closes the currently active modal.
+
+**Attribute reference:** `ATTRIBUTE_CLOSE`: `'data-srfc-close'` (srfc.ts:6)
+
+**Examples:**
+
+```html
+<div data-srfc="">
+  <div id="my-modal">
+    <button data-srfc-close>Close</button>
+    <p>Modal content</p>
+  </div>
+</div>
+```
+
+```html
+<!-- Icon close button -->
+<button data-srfc-close aria-label="Close modal">
+  <svg><!-- X icon --></svg>
+</button>
+```
+
+**Behavior:**
+- Can be placed anywhere in the document
+- Closes whichever modal is currently active
+- Typically placed inside the modal for best UX
+
+## Embed Attributes
+
+### data-srfc-embed
+
+<ParamField path="data-srfc-embed" type="string">
+  Configures iframe/video embed behavior. Value is a space-separated list: `reset`, `fit`, or both.
+</ParamField>
+
+Controls how embedded content (iframes, videos) behaves when the modal opens and closes.
+
+**Available modes:**
+
+- `reset` - Resets the `src` attribute when modal closes (stops video playback)
+- `fit` - Automatically resizes the embed to maintain aspect ratio within the modal
+
+**Attribute reference:** `ATTRIBUTE_EMBED`: `'data-srfc-embed'` (Modal.ts:6)
+
+**Mode references in source code:**
+- `EMBED_TYPE_RESET`: `'reset'` (Modal.ts:8)
+- `EMBED_TYPE_FIT`: `'fit'` (Modal.ts:9)
+
+**Examples:**
+
+```html
+<!-- YouTube embed that stops playing when closed -->
+<div data-srfc="">
+  <div id="video-modal">
+    <iframe 
+      data-srfc-embed="reset"
+      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      frameborder="0"
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
+```
+
+```html
+<!-- Responsive embed with aspect ratio fitting -->
+<iframe 
+  data-srfc-embed="fit"
+  src="https://example.com/embed"
+  width="1920" 
+  height="1080">
+</iframe>
+```
+
+```html
+<!-- Both reset and fit -->
+<iframe 
+  data-srfc-embed="reset fit"
+  src="https://player.vimeo.com/video/123456789"
+  width="1920" 
+  height="1080">
+</iframe>
+```
+
+**Behavior:**
+- `reset`: Saves the original `src`, clears it on close, restores it on next open
+- `fit`: Calculates aspect ratio from width/height attributes and resizes dynamically
+- Window resize events trigger re-fitting for `fit` embeds
+
+## Focus Attributes
+
+### data-srfc-autofocus
+
+<ParamField path="data-srfc-autofocus" type="">
+  Marks an element to receive focus when the modal opens. No value required.
+</ParamField>
+
+Specifies which element should be focused when the modal opens. This is useful for accessibility and user experience, especially for modals containing forms.
+
+**Attribute reference:** `ATTRIBUTE_AUTOFOCUS`: `'data-srfc-autofocus'` (Modal.ts:7)
+
+**Examples:**
+
+```html
+<div data-srfc="">
+  <div id="contact-modal">
+    <h2>Contact Us</h2>
+    <form>
+      <input 
+        type="text" 
+        data-srfc-autofocus
+        placeholder="Your name">
+      <textarea placeholder="Message"></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</div>
+```
+
+```html
+<!-- Focus a close button for quick dismissal -->
+<div data-srfc="">
+  <div id="alert-modal">
+    <p>Are you sure you want to delete this item?</p>
+    <button data-srfc-close data-srfc-autofocus>
+      Cancel
+    </button>
+    <button>Delete</button>
+  </div>
+</div>
+```
+
+**Behavior:**
+- Only one element per modal should have this attribute
+- Focus is applied after the modal opens
+- Handles CSS transitions by re-focusing after `transitionend` if needed
+- Works with any focusable element (inputs, buttons, links, etc.)
+
+## Complete Example
+
+Here's a full example using multiple attributes:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="srfc.css">
+</head>
+<body>
+  <!-- Trigger -->
+  <button data-srfc-open="video-gallery-1">
+    Watch Video Gallery
+  </button>
+
+  <!-- Modal Container -->
+  <div data-srfc="linked arrow">
+    <!-- First Modal -->
+    <div id="video-gallery-1">
+      <button data-srfc-close aria-label="Close">×</button>
+      <h2>Video 1</h2>
+      <iframe 
+        data-srfc-embed="reset fit"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        width="1920"
+        height="1080"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+      <button data-srfc-autofocus data-srfc-open="video-gallery-2">
+        Next Video
+      </button>
+    </div>
+
+    <!-- Second Modal -->
+    <div id="video-gallery-2">
+      <button data-srfc-close aria-label="Close">×</button>
+      <h2>Video 2</h2>
+      <iframe 
+        data-srfc-embed="reset fit"
+        src="https://www.youtube.com/embed/another-video"
+        width="1920"
+        height="1080"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <script src="srfc.js"></script>
+  <script>
+    const srfc = new Srfc()
+    srfc.init()
+  </script>
+</body>
+</html>
+```

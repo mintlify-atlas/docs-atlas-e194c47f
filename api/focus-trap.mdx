@@ -1,0 +1,112 @@
+---
+title: "FocusTrap Class"
+description: "Internal class for managing keyboard focus within modals"
+---
+
+The `FocusTrap` class manages keyboard focus to keep it within the modal when active. This ensures users navigating with the Tab key cannot accidentally focus elements outside the modal, which is important for accessibility and user experience.
+
+<Note>
+The FocusTrap class is created and managed internally by the Modal class. You typically don't need to instantiate or interact with it directly.
+</Note>
+
+## Constructor
+
+```typescript
+constructor(
+  element: Element,
+  containerElement: Element
+)
+```
+
+<ParamField path="element" type="Element" required>
+  The modal element that should contain focus
+</ParamField>
+
+<ParamField path="containerElement" type="Element" required>
+  The container element (typically the backdrop)
+</ParamField>
+
+Creates a new focus trap for the specified modal element.
+
+## Methods
+
+### activate()
+
+```typescript
+activate(): void
+```
+
+Activates the focus trap when a modal opens.
+
+**What it does:**
+- Creates invisible trap elements before the container and at the start of the body
+- Makes trap elements focusable with `tabIndex = 0`
+- Positions trap elements with `position: fixed` to prevent scrolling
+- Registers a `focusin` event listener on the document
+- Blurs any currently focused element within the modal
+
+### deactivate()
+
+```typescript
+deactivate(): void
+```
+
+Deactivates the focus trap when a modal closes.
+
+**What it does:**
+- Removes all trap elements from the DOM
+- Removes the `focusin` event listener
+
+## How Focus Trapping Works
+
+The FocusTrap implementation uses a "trap element" strategy:
+
+1. **Trap Elements**: When activated, the FocusTrap inserts invisible focusable `<div>` elements:
+   - `preTrapOuter`: Placed before the container element
+   - `preTrap`: Placed before the container element
+   - `bodyPreTrap`: Placed at the beginning of the document body
+
+2. **Focus Monitoring**: A `focusin` event listener monitors all focus changes in the document
+
+3. **Focus Redirection**: When focus lands on a trap element or any element outside the modal:
+   - If the user tabbed forward (focus on `bodyPreTrap` or `preTrapOuter`): Focus moves to the first focusable element in the modal
+   - If the user tabbed backward (focus on `preTrap`): Focus moves to the last focusable element in the modal
+
+4. **Focusable Element Detection**: The trap automatically detects focusable elements by:
+   - Querying all elements within the modal
+   - Attempting to focus each element
+   - Checking if the element becomes `document.activeElement`
+   - This approach works with any focusable element (buttons, links, inputs, elements with `tabindex`, etc.)
+
+## Internal Methods
+
+### focusFirstFocusable()
+
+Finds and focuses the first focusable element within the modal. Iterates through all elements and attempts to focus each one until successful.
+
+### focusLastFocusable()
+
+Finds and focuses the last focusable element within the modal. Iterates backwards through all elements and attempts to focus each one until successful.
+
+### blurIn()
+
+A specialized blur method that works cross-browser. Some browsers remember the last focused element even after blur, which can interfere with tab navigation. This method creates a temporary trap element, focuses it, then removes it, effectively clearing the browser's memory of the last focused element.
+
+## Browser Compatibility
+
+The focus trap implementation accounts for browser differences:
+
+- Uses `position: fixed` on trap elements to prevent scroll jumps
+- The `blurIn()` method handles browser-specific focus memory behavior
+- Works in Chrome, Firefox, Safari, and other modern browsers
+
+## Usage Note
+
+The FocusTrap is automatically created when a Modal is instantiated:
+
+```typescript
+// Inside Modal constructor
+this.focusTrap = new FocusTrap(element, containerElement)
+```
+
+The Modal class calls `activate()` when opening and `deactivate()` when closing. You don't need to manage focus trapping manually unless you're building custom modal functionality.

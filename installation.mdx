@@ -1,0 +1,122 @@
+---
+title: Installation
+description: Install Srfc using your preferred package manager or via CDN.
+---
+
+# Installation
+
+Get started with Srfc by installing it through npm, yarn, pnpm, or by including it directly via CDN.
+
+## Package manager
+
+<Steps>
+  <Step title="Install the package">
+    Install Srfc using your preferred package manager:
+
+    <CodeGroup>
+      ```bash npm
+      npm install srfc
+      ```
+
+      ```bash yarn
+      yarn add srfc
+      ```
+
+      ```bash pnpm
+      pnpm add srfc
+      ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Import the library">
+    Import the Srfc class in your JavaScript or TypeScript file:
+
+    ```javascript
+    import { Srfc } from 'srfc';
+    ```
+  </Step>
+
+  <Step title="Import the CSS">
+    Import the CSS file to include the default modal styles:
+
+    ```javascript
+    import 'srfc/dist/srfc.min.css';
+    ```
+
+    Or if you're using a bundler that doesn't support importing CSS from node_modules, you can link it in your HTML:
+
+    ```html
+    <link rel="stylesheet" href="node_modules/srfc/dist/srfc.min.css">
+    ```
+  </Step>
+
+  <Step title="Initialize Srfc">
+    Create a new instance and initialize it:
+
+    ```javascript
+    const srfc = new Srfc();
+    srfc.init();
+    ```
+  </Step>
+</Steps>
+
+## CDN
+
+You can include Srfc directly in your HTML using a CDN. This is perfect for quick prototypes or simple projects.
+
+<Steps>
+  <Step title="Add the CSS">
+    Add the Srfc stylesheet to your HTML `<head>`:
+
+    ```html
+    <link rel="stylesheet" href="https://unpkg.com/srfc@0.10.0/dist/srfc.min.css">
+    ```
+  </Step>
+
+  <Step title="Add the JavaScript">
+    Add the Srfc script before your closing `</body>` tag:
+
+    ```html
+    <script src="https://unpkg.com/srfc@0.10.0/dist/srfc.min.js"></script>
+    ```
+
+    <Note>
+      When using the CDN version, Srfc automatically initializes itself. You don't need to call `init()` manually.
+    </Note>
+  </Step>
+</Steps>
+
+## TypeScript setup
+
+Srfc includes full TypeScript type definitions out of the box. If you're using TypeScript, you'll get autocomplete and type checking automatically.
+
+```typescript
+import { Srfc } from 'srfc';
+
+const srfc: Srfc = new Srfc();
+srfc.init();
+
+// Open a modal programmatically with type safety
+srfc.open('my-modal-id');
+```
+
+## Verification
+
+To verify that Srfc is installed correctly, you can check the version:
+
+```javascript
+import { Srfc } from 'srfc';
+
+const srfc = new Srfc();
+console.log('Srfc loaded successfully');
+```
+
+<Tip>
+  The current stable version is **0.10.0**. Always use the latest version for the newest features and bug fixes.
+</Tip>
+
+## Next steps
+
+<Card title="Quickstart" icon="rocket" href="/quickstart">
+  Follow our quickstart guide to create your first modal.
+</Card>

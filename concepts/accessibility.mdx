@@ -1,0 +1,213 @@
+---
+title: Accessibility
+description: How Srfc ensures accessible modal dialogs
+---
+
+Srfc is built with accessibility as a core feature. Every modal automatically includes focus management, keyboard navigation, and proper ARIA attributes.
+
+## Focus trapping
+
+When a modal opens, Srfc activates a focus trap that keeps keyboard focus inside the modal. This prevents users from accidentally tabbing to content behind the modal.
+
+### How it works
+
+The `FocusTrap` class creates invisible trap elements around your modal:
+
+1. When the modal opens, three trap elements are inserted into the DOM
+2. If focus moves outside the modal, the trap catches it
+3. Focus is redirected to either the first or last focusable element inside the modal
+4. When the modal closes, all trap elements are removed
+
+```typescript
+// From FocusTrap.ts:13-36
+public activate(): void {
+  const preTrapOuter = document.createElement('div')
+  preTrapOuter.tabIndex = 0 // Makes it focusable
+  preTrapOuter.style.position = 'fixed' // Prevents scrolling
+
+  // Creates traps and inserts them into the DOM
+  this.containerElement.insertAdjacentElement('beforebegin', preTrapOuter)
+  this.containerElement.insertAdjacentElement('beforebegin', preTrap)
+  document.body.insertAdjacentElement('afterbegin', bodyPreTrap)
+
+  // Activates focus event listener
+  document.addEventListener('focusin', this.FOCUS_HANDLER_BINDED)
+}
+```
+
+<Tip>
+  The focus trap uses `position: fixed` on trap elements to prevent page scrolling if a trap accidentally receives focus.
+</Tip>
+
+### Focus redirection
+
+When focus attempts to escape the modal:
+
+- **Forward tabbing** (past the last element): Focus moves to the first focusable element
+- **Backward tabbing** (before the first element): Focus moves to the last focusable element
+
+This creates a seamless loop of focusable elements within your modal.
+
+## Keyboard navigation
+
+Srfc provides comprehensive keyboard support for all modal interactions.
+
+### Escape key
+
+Press **Escape** (or **Esc** in IE11) to close any modal:
+
+```typescript
+// From Modal.ts:60-68
+private escKeyHandler(event: KeyboardEvent): void {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    this.close()
+    if (this.isLinked) {
+      window.history.back()
+    }
+    this.onClose()
+  }
+}
+```
+
+<Note>
+  Strong modals (`data-srfc="strong"` or `data-srfc="strong-esc"`) disable the Escape key for non-dismissible dialogs.
+</Note>
+
+### Arrow keys
+
+When `data-srfc="arrow"` is enabled, use arrow keys to navigate between sibling modals:
+
+```typescript
+// From Modal.ts:74-80
+private arrowKeysHandler(event: KeyboardEvent): void {
+  if (event.key === 'ArrowRight' || event.key === 'Right') {
+    this.onNext()
+  } else if (event.key === 'ArrowLeft' || event.key === 'Left') {
+    this.onPrev()
+  }
+}
+```
+
+- **ArrowRight** / **Right** (IE11): Next modal
+- **ArrowLeft** / **Left** (IE11): Previous modal
+
+## ARIA attributes
+
+While Srfc handles focus management automatically, you should add appropriate ARIA attributes to your modal HTML:
+
+```html
+<div data-srfc>
+  <div id="my-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <h2 id="modal-title">Modal Title</h2>
+    <p>Modal content goes here.</p>
+    <button data-srfc-close aria-label="Close modal">×</button>
+  </div>
+</div>
+```
+
+### Recommended ARIA attributes
+
+- `role="dialog"` or `role="alertdialog"` on the modal element
+- `aria-labelledby` pointing to the modal's title
+- `aria-describedby` pointing to the main content (optional)
+- `aria-modal="true"` to indicate the modal state
+- `aria-label` on close buttons without visible text
+
+## Screen reader support
+
+Srfc's focus management ensures screen readers automatically announce modal content:
+
+1. When a modal opens, focus moves inside the modal
+2. Screen readers announce the focused element (typically the first focusable item)
+3. Users can navigate the modal content normally
+4. When the modal closes, focus returns to the trigger element
+
+### Autofocus support
+
+You can specify which element should receive focus when the modal opens:
+
+```html
+<div data-srfc>
+  <div id="my-modal" role="dialog">
+    <h2>Sign in</h2>
+    <input type="text" data-srfc-autofocus placeholder="Username">
+    <input type="password" placeholder="Password">
+  </div>
+</div>
+```
+
+The `data-srfc-autofocus` attribute ensures that element receives focus immediately, even with CSS transitions.
+
+<Tip>
+  If no autofocus element is specified, Srfc focuses the first focusable element in the modal by default.
+</Tip>
+
+## Best practices
+
+### Return focus to trigger
+
+Srfc automatically remembers which element opened the modal and returns focus to it on close:
+
+```typescript
+// From Srfc.ts:209-213
+if (document.activeElement instanceof HTMLElement) {
+  this.activeElementBeforeOpening = document.activeElement
+}
+```
+
+This ensures keyboard users don't lose their place when closing a modal.
+
+### Prevent body scroll
+
+When a modal opens, Srfc adds the `srfc-active` class to `<body>`. Use this to prevent background scrolling:
+
+```css
+body.srfc-active {
+  overflow: hidden;
+}
+```
+
+### Provide visible focus indicators
+
+Ensure all interactive elements have clear focus styles:
+
+```css
+button:focus,
+a:focus {
+  outline: 2px solid blue;
+  outline-offset: 2px;
+}
+```
+
+### Use strong modals sparingly
+
+Non-dismissible modals can be frustrating. Only use `data-srfc="strong"` for critical actions:
+
+- Legal acceptance
+- Destructive confirmations
+- Required form completion
+
+Always provide an explicit close button:
+
+```html
+<div data-srfc="strong">
+  <div id="terms" role="dialog">
+    <h2>Terms of Service</h2>
+    <p>You must accept to continue.</p>
+    <button data-srfc-close>Accept</button>
+  </div>
+</div>
+```
+
+### Test with keyboard only
+
+Verify your modals are fully accessible by:
+
+1. Opening a modal using only Tab and Enter
+2. Navigating all modal content with Tab
+3. Closing the modal with Escape or Tab to the close button
+4. Verifying focus returns to the trigger element
+
+<Note>
+  Srfc handles focus trapping automatically, but you're responsible for ensuring all interactive elements inside the modal are keyboard-accessible.
+</Note>

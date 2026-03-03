@@ -1,0 +1,147 @@
+---
+title: Modal types
+description: Learn about the different modal types in Srfc and how to use them
+---
+
+Srfc supports multiple modal types that control how modals behave. You configure modal types using the `data-srfc` attribute on the container element.
+
+## Basic modals
+
+By default, modals are dismissible and have standard behavior:
+
+- Close when clicking the backdrop
+- Close when pressing Escape
+- No URL integration
+- No arrow key navigation
+
+```html
+<div data-srfc>
+  <div id="my-modal">
+    <!-- Modal content -->
+  </div>
+</div>
+```
+
+## Modal type options
+
+You can combine multiple types by separating them with spaces in the `data-srfc` attribute.
+
+<Tabs>
+  <Tab title="Linked modals">
+    Linked modals integrate with the browser's URL hash. When opened, they update the URL with the modal's ID, enabling:
+
+    - Direct linking to modals
+    - Browser back/forward navigation
+    - Bookmark support
+
+    ```html
+    <div data-srfc="linked">
+      <div id="gallery-1">
+        <!-- Modal content -->
+      </div>
+    </div>
+    ```
+
+    When this modal opens, the URL becomes `yoursite.com/#gallery-1`. Pressing the browser's back button closes the modal.
+
+    <Note>
+      Linked modals automatically open if the page loads with their hash in the URL.
+    </Note>
+  </Tab>
+
+  <Tab title="Arrow navigation">
+    Enable keyboard navigation between sibling modals using arrow keys:
+
+    ```html
+    <div data-srfc="arrow">
+      <div id="image-1"><!-- First image --></div>
+      <div id="image-2"><!-- Second image --></div>
+      <div id="image-3"><!-- Third image --></div>
+    </div>
+    ```
+
+    - **ArrowRight** or **Right** (IE11): Opens the next modal
+    - **ArrowLeft** or **Left** (IE11): Opens the previous modal
+
+    <Tip>
+      Arrow navigation is perfect for image galleries or multi-step wizards.
+    </Tip>
+  </Tab>
+
+  <Tab title="Strong modals">
+    Strong modals prevent dismissal, forcing users to interact with the modal content. Srfc provides three levels of strength:
+
+    ### Full strength (non-dismissible)
+
+    Prevents all dismissal methods:
+
+    ```html
+    <div data-srfc="strong">
+      <div id="important-modal">
+        <!-- User must interact with content to close -->
+      </div>
+    </div>
+    ```
+
+    - Cannot close by clicking backdrop
+    - Cannot close by pressing Escape
+
+    ### Strong backdrop only
+
+    Prevents backdrop clicks but allows Escape key:
+
+    ```html
+    <div data-srfc="strong-backdrop">
+      <div id="modal">
+        <!-- Can close with Escape -->
+      </div>
+    </div>
+    ```
+
+    ### Strong Escape only
+
+    Prevents Escape key but allows backdrop clicks:
+
+    ```html
+    <div data-srfc="strong-esc">
+      <div id="modal">
+        <!-- Can close by clicking backdrop -->
+      </div>
+    </div>
+    ```
+
+    <Note>
+      Strong modals should always provide an explicit close button with `data-srfc-close` to ensure users have a way to dismiss them.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Combining types
+
+You can combine multiple modal types to create custom behaviors:
+
+```html
+<!-- Linked gallery with arrow navigation -->
+<div data-srfc="linked arrow">
+  <div id="photo-1"><!-- Photo 1 --></div>
+  <div id="photo-2"><!-- Photo 2 --></div>
+</div>
+
+<!-- Non-dismissible linked modal -->
+<div data-srfc="linked strong">
+  <div id="terms">
+    <!-- Terms acceptance modal -->
+  </div>
+</div>
+```
+
+## Type reference
+
+| Type | Attribute Value | Description |
+|------|----------------|-------------|
+| Basic | _(no value)_ | Default dismissible modal |
+| Linked | `linked` | URL hash integration |
+| Arrow navigation | `arrow` | Navigate between sibling modals |
+| Full strength | `strong` | Non-dismissible |
+| Strong backdrop | `strong-backdrop` | Disable backdrop dismiss only |
+| Strong Escape | `strong-esc` | Disable Escape key only |
