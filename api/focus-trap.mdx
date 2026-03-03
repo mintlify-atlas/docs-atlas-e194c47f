@@ -3,10 +3,14 @@ title: "FocusTrap Class"
 description: "Internal class for managing keyboard focus within modals"
 ---
 
+<Warning>
+  The `FocusTrap` class is **not exported** from the public API. It is documented here for advanced users who want to understand Srfc's internals. You cannot import or instantiate this class directly.
+</Warning>
+
 The `FocusTrap` class manages keyboard focus to keep it within the modal when active. This ensures users navigating with the Tab key cannot accidentally focus elements outside the modal, which is important for accessibility and user experience.
 
 <Note>
-The FocusTrap class is created and managed internally by the Modal class. You typically don't need to instantiate or interact with it directly.
+The FocusTrap class is created and managed internally by the Modal class. Focus trapping happens automatically when you use Srfc.
 </Note>
 
 ## Constructor

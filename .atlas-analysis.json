@@ -55,7 +55,7 @@
     ]
   },
   "keyFeatures": [
-    "Accessible modal dialogs with ARIA support and focus trapping",
+    "Accessible modal dialogs with focus trapping and keyboard navigation",
     "Multiple modal types: basic, linked (URL hash), arrow navigation, strong (non-dismissible)",
     "Keyboard navigation with Escape and Arrow key support",
     "Browser history integration for linked modals",
@@ -65,11 +65,12 @@
     "TypeScript support with full type definitions"
   ],
   "publicApiSurface": [
+    "Srfc class (exported) - Main class for modal management",
     "Srfc.init() - Initialize the library and register modal events",
     "Srfc.open(id: string) - Open a modal by ID",
     "Srfc.close() - Close the currently active modal",
-    "Modal class - Internal modal management",
-    "FocusTrap class - Focus trapping functionality",
+    "Modal class (internal, not exported) - Internal modal management",
+    "FocusTrap class (internal, not exported) - Focus trapping functionality",
     "data-srfc attribute - Define modal containers and types",
     "data-srfc-open attribute - Trigger elements to open modals",
     "data-srfc-close attribute - Elements to close modals",
